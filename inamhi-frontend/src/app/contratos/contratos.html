@@ -19,12 +19,12 @@
         <table class="table-custom" *ngIf="listaContratos.length > 0">
             <thead>
                 <tr>
-                    <th>NÚMERO CONTRATO</th>
+                    <th>NÚMERO</th>
                     <th>PROFESIONAL</th>
-                    <th>HONORARIOS (MENSUAL)</th>
+                    <th>HONORARIOS</th>
                     <th>VIGENCIA</th>
                     <th style="text-align: center;">ESTADO</th>
-                    <th>ACCIÓN</th>
+                    <th>ACCIONES</th>
                 </tr>
             </thead>
             <tbody>
@@ -52,13 +52,20 @@
                     </td>
 
                     <td>
-                        <div style="display: flex; gap: 10px;">
-                            <button (click)="verDetalle(c)" style="background-color: #003366; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer;">
-                                🔍 Ver
+                        <div style="display: flex; gap: 8px;">
+                            <button (click)="verDetalle(c)" title="Ver Detalles"
+                                    style="background-color: #003366; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer;">
+                                🔍
                             </button>
                             
                             <button *ngIf="rolUsuario !== 'OPERATIVO'" 
-                                    (click)="eliminar(c.id_contrato)" 
+                                    (click)="abrirModalEditar(c)" title="Editar"
+                                    style="background-color: #ffca28; color: #333; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer;">
+                                ✏️
+                            </button>
+
+                            <button *ngIf="rolUsuario !== 'OPERATIVO'" 
+                                    (click)="eliminar(c.id_contrato)" title="Eliminar"
                                     style="background-color: #ffebee; color: #c62828; border: 1px solid #c62828; padding: 6px 10px; border-radius: 6px; cursor: pointer;">
                                 🗑️
                             </button>
@@ -73,7 +80,7 @@
 <div class="modal-overlay" *ngIf="mostrarModalCrear" (click)="cerrarModalCrear()">
     <div class="modal-content" (click)="$event.stopPropagation()" style="max-width: 700px;"> 
         <div class="modal-header">
-            <h3>➕ Registrar Nuevo Contrato</h3>
+            <h3>{{ esEdicion ? '✏️ Editar Contrato' : '➕ Registrar Nuevo Contrato' }}</h3>
             <button class="close-btn" (click)="cerrarModalCrear()">×</button>
         </div>
         <div class="modal-body">
@@ -81,21 +88,24 @@
                 <div style="display: flex; gap: 15px;">
                     <div class="form-group" style="flex:1;">
                         <label>Número de Contrato *</label>
-                        <input type="text" class="input-custom" [(ngModel)]="nuevoContrato.numero">
+                        <input type="text" class="input-custom" [(ngModel)]="nuevoContrato.numero" placeholder="Ej: CTR-2025-001">
                     </div>
                     <div class="form-group" style="flex:1;">
                         <label>Cédula Profesional *</label>
                         <input type="text" class="input-custom" [(ngModel)]="nuevoContrato.cedula">
                     </div>
                 </div>
+                
                 <div class="form-group">
-                    <label>Nombre Completo *</label>
+                    <label>Nombre Completo del Profesional *</label>
                     <input type="text" class="input-custom" [(ngModel)]="nuevoContrato.nombre">
                 </div>
+
                 <div class="form-group">
-                    <label>Dirección Domiciliaria</label>
-                    <input type="text" class="input-custom" [(ngModel)]="nuevoContrato.direccion_domicilio">
+                    <label>Objeto del Contrato</label>
+                    <textarea class="input-custom" [(ngModel)]="nuevoContrato.objeto_contrato" rows="2"></textarea>
                 </div>
+                
                 <div style="display: flex; gap: 15px;">
                     <div class="form-group" style="flex:1;">
                         <label>Área Solicitante</label>
@@ -105,10 +115,11 @@
                         </select>
                     </div>
                     <div class="form-group" style="flex:1;">
-                        <label>Honorarios</label>
+                        <label>Honorarios ($)</label>
                         <input type="number" class="input-custom" [(ngModel)]="nuevoContrato.honorarios">
                     </div>
                 </div>
+
                 <div style="display: flex; gap: 15px;">
                     <div class="form-group" style="flex:1;">
                         <label>Fecha Inicio</label>
@@ -123,17 +134,20 @@
         </div>
         <div class="modal-footer" style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
             <button (click)="cerrarModalCrear()" style="padding: 10px 20px; background: #eee; border: none; border-radius: 4px; cursor: pointer;">Cancelar</button>
-            <button (click)="guardarContrato()" style="padding: 10px 20px; background: #003366; color: white; border: none; border-radius: 4px; cursor: pointer;">Guardar</button>
+            
+            <button (click)="guardarContrato()" style="padding: 10px 20px; background: #003366; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                {{ esEdicion ? '💾 Actualizar Cambios' : '💾 Guardar Contrato' }}
+            </button>
         </div>
     </div> 
 </div>
 
-<div class="modal-overlay" *ngIf="mostrarModal && seleccionado" (click)="cerrarModal()">
+<div class="modal-overlay" *ngIf="mostrarModalVer && seleccionado" (click)="cerrarModalVer()">
     <div class="modal-content" (click)="$event.stopPropagation()" style="max-width: 600px; border-radius: 10px; overflow: hidden;">
         
         <div style="background-color: #003366; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center;">
             <h3 style="margin: 0; font-size: 18px;">📄 Detalle del Contrato</h3>
-            <button (click)="cerrarModal()" style="background: none; border: none; color: white; font-size: 24px; cursor: pointer;">×</button>
+            <button (click)="cerrarModalVer()" style="background: none; border: none; color: white; font-size: 24px; cursor: pointer;">×</button>
         </div>
 
         <div style="padding: 25px; overflow-y: auto;">
@@ -147,24 +161,20 @@
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                
                 <div>
                     <label style="font-size: 12px; color: #888; font-weight: bold;">PROFESIONAL</label>
                     <p style="margin: 5px 0; font-weight: bold;">{{ seleccionado.nombre_completo_profesional }}</p>
                     <p style="margin: 0; font-size: 13px; color: #555;">CI: {{ seleccionado.cedula_profesional || 'N/A' }}</p>
                 </div>
-
                 <div>
                     <label style="font-size: 12px; color: #888; font-weight: bold;">HONORARIOS</label>
                     <p style="margin: 5px 0; font-weight: bold; color: #2e7d32; font-size: 18px;">$ {{ seleccionado.honorarios_mensuales }}</p>
                 </div>
-
                 <div>
                     <label style="font-size: 12px; color: #888; font-weight: bold;">VIGENCIA</label>
                     <p style="margin: 5px 0; font-size: 14px;">📅 Inicio: {{ seleccionado.fecha_inicio | date:'dd/MM/yyyy' }}</p>
                     <p style="margin: 0; font-size: 14px;">📅 Fin: {{ seleccionado.fecha_fin | date:'dd/MM/yyyy' }}</p>
                 </div>
-
                 <div>
                     <label style="font-size: 12px; color: #888; font-weight: bold;">ÁREA / SUPERVISOR</label>
                     <p style="margin: 5px 0; font-size: 14px;">🏢 {{ seleccionado.nombre_direccion || 'No asignada' }}</p>
@@ -172,23 +182,13 @@
                         👮 {{ seleccionado.nombre_supervisor || 'Supervisor no asignado' }}
                     </p>
                 </div>
-
             </div>
-
-            <div style="margin-top: 20px;">
-                <label style="font-size: 12px; color: #888; font-weight: bold;">DIRECCIÓN DOMICILIARIA</label>
-                <div style="background: #f9f9f9; padding: 10px; border-radius: 5px; border: 1px solid #eee; margin-top: 5px;">
-                    {{ seleccionado.direccion_domicilio || 'No registrada' }}
-                </div>
-            </div>
-
         </div>
 
         <div style="padding: 15px; background: #f4f4f4; text-align: right; border-top: 1px solid #ddd;">
-            <button (click)="cerrarModal()" style="background: #6c757d; color: white; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer;">
+            <button (click)="cerrarModalVer()" style="background: #6c757d; color: white; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer;">
                 Cerrar
             </button>
         </div>
-
     </div>
 </div>

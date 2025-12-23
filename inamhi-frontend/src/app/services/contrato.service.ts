@@ -7,51 +7,38 @@ import { Observable } from 'rxjs';
 })
 export class ContratoService {
 
-  // URL del Backend
-  private apiUrl = 'http://localhost:3000/api/contratos';
-  private apiCatalogos = 'http://localhost:3000/api/catalogos'; 
+  // OJO: Asegúrate de que sea el puerto 3000 (Tu backend de Node.js)
+  private apiUrl = 'http://localhost:3000/api/contratos'; 
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-  // ==============================================================
-  // 1. OBTENER LISTAS (Para Tabla y Selects)
-  // ==============================================================
-
-  // Obtener todos los contratos
-  getContratos(): Observable<any[]> {
-    return this.http.get<any[]>(this.apiUrl);
+  // 1. OBTENER TODOS (Para la tabla)
+  getContratos(): Observable<any> {
+    return this.http.get(this.apiUrl);
   }
 
-  // ✅ ESTA ES LA QUE NECESITAS PARA LOS SELECTS
+  // 2. OBTENER CATALOGOS (Para llenar los selects de Áreas y Supervisores)
   getCatalogos(): Observable<any> {
-    return this.http.get<any>(this.apiCatalogos);
+    return this.http.get(`${this.apiUrl}/catalogos`);
   }
 
-  // ==============================================================
-  // 2. ACCIONES DE GESTIÓN (Crear, Editar, Borrar)
-  // ==============================================================
+  // 3. OBTENER UN SOLO CONTRATO POR ID (Para llenar el formulario al Editar)
+  getContratoById(id: any): Observable<any> {
+    return this.http.get(`${this.apiUrl}/${id}`);
+  }
 
-  // Crear contrato nuevo
+  // 4. CREAR NUEVO CONTRATO
   createContrato(data: any): Observable<any> {
-    return this.http.post<any>(this.apiUrl, data);
+    return this.http.post(this.apiUrl, data);
   }
 
-  // Eliminar contrato (Probablemente tu lista lo está buscando y por eso da error)
-  deleteContrato(id: number): Observable<any> {
+  // 5. ACTUALIZAR CONTRATO EXISTENTE (PUT)
+  updateContrato(id: any, data: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}`, data);
+  }
+
+  // 6. ELIMINAR CONTRATO
+  deleteContrato(id: any): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
-  }
-
-  // Actualizar Estado (Aprobar/Finalizar)
-  updateEstado(id: number, nuevoEstado: string): Observable<any> {
-    return this.http.put(`${this.apiUrl}/${id}/estado`, { nuevoEstado });
-  }
-
-  // ==============================================================
-  // 3. ACCIONES DE OPERATIVO (Archivos)
-  // ==============================================================
-
-  // Subir PDF
-  subirEntregable(formData: FormData): Observable<any> {
-    return this.http.post(`${this.apiUrl}/upload`, formData);
   }
 }

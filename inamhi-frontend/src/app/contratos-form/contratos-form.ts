@@ -1,14 +1,16 @@
 import { Component, OnInit } from '@angular/core';
-import { RouterLink, Router } from '@angular/router';
+import { RouterLink, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common'; // <--- IMPORTANTE PARA EL *ngFor
+import { CommonModule } from '@angular/common';
+// CORRECCIÓN 1: La ruta correcta con ../../
+// ASÍ ES LA CORRECTA:
 import { ContratoService } from '../services/contrato.service';
 import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-contratos-form',
   standalone: true,
-  imports: [RouterLink, FormsModule, CommonModule], // <--- Verifica que CommonModule esté aquí
+  imports: [RouterLink, FormsModule, CommonModule],
   templateUrl: './contratos-form.html',
   styleUrl: './contratos-form.css'
 })
@@ -21,32 +23,62 @@ export class ContratosFormComponent implements OnInit {
   nuevoInicio: string = '';
   nuevoFin: string = '';
   
-  // VARIABLES PARA LOS SELECTS
   selectedArea: any = null;       
   selectedSupervisor: any = null; 
 
-  // LISTAS VACÍAS (Se llenarán al iniciar)
   listaAreas: any[] = [];
   listaSupervisores: any[] = [];
 
-  constructor(private contratoService: ContratoService, private router: Router) {}
+  // Variables de Edición
+  esEdicion: boolean = false;
+  idContratoEditar: any = null;
+
+  constructor(
+    private contratoService: ContratoService, 
+    private router: Router,
+    private route: ActivatedRoute
+  ) {}
 
   ngOnInit() {
-    // AL INICIAR, PEDIMOS LOS DATOS
     this.cargarListas();
+
+    // VERIFICAR SI ESTAMOS EDITANDO
+    this.route.queryParams.subscribe(params => {
+      const id = params['id'];
+      if (id) {
+        this.esEdicion = true;
+        this.idContratoEditar = id;
+        this.cargarDatosEditar(id);
+      }
+    });
   }
 
   cargarListas() {
-    console.log("🔄 Cargando listas de áreas y supervisores...");
     this.contratoService.getCatalogos().subscribe({
       next: (data: any) => {
-        console.log("✅ Datos recibidos del backend:", data);
         this.listaAreas = data.areas;
         this.listaSupervisores = data.supervisores;
       },
-      error: (err) => {
-        console.error("❌ Error cargando listas:", err);
-        Swal.fire('Error', 'No se pudieron cargar las áreas. Revisa que el Backend esté encendido.', 'error');
+      // CORRECCIÓN 2: Agregar tipo : any
+      error: (err: any) => console.error("Error cargando listas", err)
+    });
+  }
+
+  cargarDatosEditar(id: any) {
+    this.contratoService.getContratoById(id).subscribe({
+      next: (data: any) => {
+        this.nuevoNombre = data.nombre_completo_profesional;
+        this.nuevoCargo = data.cargo_profesional;
+        this.nuevoHonorario = data.honorarios_mensuales;
+        this.nuevoInicio = data.fecha_inicio ? data.fecha_inicio.split('T')[0] : '';
+        this.nuevoFin = data.fecha_fin ? data.fecha_fin.split('T')[0] : '';
+        this.selectedArea = data.id_direccion_solicitante;
+        this.selectedSupervisor = data.id_usuario_supervisor;
+      },
+      // CORRECCIÓN 3: Agregar tipo : any
+      error: (err: any) => {
+        console.error(err);
+        Swal.fire('Error', 'No se cargó el contrato', 'error');
       }
     });
   }
@@ -57,30 +89,42 @@ export class ContratosFormComponent implements OnInit {
       return;
     }
 
-    const nuevoContrato = {
+    const datosContrato = {
       nombre: this.nuevoNombre,
       cargo: this.nuevoCargo,
       honorarios: Number(this.nuevoHonorario) || 0,
       inicio: this.nuevoInicio !== '' ? this.nuevoInicio : null,
       fin: this.nuevoFin !== '' ? this.nuevoFin : null,
-      estado: 'VIGENTE',
-      
-      // ENVIAMOS LOS IDs SELECCIONADOS
       idArea: this.selectedArea,
       idSupervisor: this.selectedSupervisor
     };
 
-    console.log("Enviando:", nuevoContrato);
-
-    this.contratoService.createContrato(nuevoContrato).subscribe({
-      next: () => {
-        Swal.fire('¡Éxito!', 'Contrato guardado correctamente', 'success').then(() => {
+    if (this.esEdicion) {
+      // ACTUALIZAR
+      this.contratoService.updateContrato(this.idContratoEditar, datosContrato).subscribe({
+        next: () => {
+          Swal.fire('¡Actualizado!', 'Contrato editado correctamente', 'success');
           this.router.navigate(['/contratos']);
-        });
-      },
-      error: (err) => {
-        Swal.fire('Error', err.error?.error || 'Error desconocido', 'error');
-      }
-    });
+        },
+        // CORRECCIÓN 4: Agregar tipo : any
+        error: (err: any) => {
+           console.error(err);
+           Swal.fire('Error', 'Error al actualizar', 'error');
+        }
+      });
+    } else {
+      // CREAR
+      this.contratoService.createContrato(datosContrato).subscribe({
+        next: () => {
+          Swal.fire('¡Éxito!', 'Contrato creado correctamente', 'success');
+          this.router.navigate(['/contratos']);
+        },
+        // CORRECCIÓN 5: Agregar tipo : any
+        error: (err: any) => {
+           console.error(err);
+           Swal.fire('Error', 'Error al crear', 'error');
+        }
+      });
+    }
   }
 }
