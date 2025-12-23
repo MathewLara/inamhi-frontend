@@ -1,0 +1,110 @@
+<div class="page-container">
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+        <div>
+            <h2 style="color: #003366; margin: 0;">🔧 Gestión de Mantenimientos</h2>
+            <p style="color: #666; margin: 5px 0 0 0;">Reporte y seguimiento de fallos técnicos</p>
+        </div>
+        
+        <button class="btn-nuevo" (click)="abrirModalReporte()">
+            ➕ Reportar Fallo
+        </button>
+    </div>
+
+    <div class="card-table">
+        <div *ngIf="listaMantenimientos.length === 0" style="text-align: center; padding: 40px; color: #888;">
+            <p>✅ No hay reportes pendientes.</p>
+        </div>
+
+        <table class="table-custom" *ngIf="listaMantenimientos.length > 0">
+            <thead>
+                <tr>
+                    <th>EQUIPO / DISPOSITIVO</th>
+                    <th>FALLO REPORTADO</th>
+                    <th>FECHA REPORTE</th>
+                    <th>TÉCNICO SUGERIDO</th>
+                    <th style="text-align: center;">ESTADO (CLIC CAMBIAR)</th>
+                    <th>ACCIÓN</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let m of listaMantenimientos">
+                    <td style="font-weight: bold; color: #003366;">{{ m.nombre_equipo }}</td>
+                    <td>{{ m.descripcion_fallo }}</td>
+                    <td>📅 {{ m.fecha_reporte | date:'dd/MM/yyyy' }}</td>
+                    <td style="font-style: italic; color: #666;">
+                        {{ m.tecnico_sugerido || 'No especificado' }}
+                    </td>
+                    
+                    <td style="text-align: center;">
+                        <button *ngIf="m.estado === 'PENDIENTE'" (click)="cambiarEstado(m, 'EN PROCESO')" 
+                                style="background: #fff3cd; color: #856404; border: 1px solid #ffeeba; padding: 5px 10px; border-radius: 20px; cursor: pointer; font-size: 12px;">
+                            ⏳ Pendiente
+                        </button>
+                        <button *ngIf="m.estado === 'EN PROCESO'" (click)="cambiarEstado(m, 'FINALIZADO')" 
+                                style="background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; padding: 5px 10px; border-radius: 20px; cursor: pointer; font-size: 12px;">
+                            ⚙️ En Proceso
+                        </button>
+                        <span *ngIf="m.estado === 'FINALIZADO'" 
+                              style="background: #d4edda; color: #155724; border: 1px solid #c3e6cb; padding: 5px 10px; border-radius: 20px; font-size: 12px;">
+                            ✅ Finalizado
+                        </span>
+                    </td>
+
+                    <td>
+                        <button style="background-color: #003366; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer;">
+                            🔍 Ver
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<div class="modal-overlay" *ngIf="mostrarModalReporte" (click)="cerrarModalReporte()">
+    <div class="modal-content" (click)="$event.stopPropagation()" style="max-width: 500px;"> 
+        <div class="modal-header" style="background-color: #003366; color: white; padding: 15px; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="margin: 0;">⚠️ Reportar Nuevo Fallo</h3>
+            <button (click)="cerrarModalReporte()" style="background: none; border: none; color: white; font-size: 20px; cursor: pointer;">×</button>
+        </div>
+
+        <div class="modal-body" style="padding: 20px;">
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+
+                <div class="form-group">
+                    <label style="font-weight: bold; display: block; margin-bottom: 5px;">Nombre del Equipo / Dispositivo:</label>
+                    <input type="text" [(ngModel)]="nuevoReporte.nombre_equipo" placeholder="Ej: Monitor Samsung, Impresora HP..." 
+                           style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+
+                <div class="form-group">
+                    <label style="font-weight: bold; display: block; margin-bottom: 5px;">Descripción del Fallo:</label>
+                    <input type="text" [(ngModel)]="nuevoReporte.descripcion_fallo" placeholder="Ej: No enciende, pantalla azul..." 
+                           style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+
+                <div class="form-group">
+                    <label style="font-weight: bold; display: block; margin-bottom: 5px;">Fecha del Reporte:</label>
+                    <input type="date" [(ngModel)]="nuevoReporte.fecha_reporte" 
+                           style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+
+                <div class="form-group">
+                    <label style="font-weight: bold; display: block; margin-bottom: 5px;">Técnico Sugerido (Opcional):</label>
+                    <input type="text" [(ngModel)]="nuevoReporte.tecnico_sugerido" placeholder="Ej: Soporte IT" 
+                           style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+
+            </div>
+        </div>
+
+        <div class="modal-footer" style="padding: 15px; border-top: 1px solid #eee; display: flex; justify-content: flex-end; gap: 10px;">
+            <button (click)="cerrarModalReporte()" style="padding: 8px 16px; border: 1px solid #ddd; background: #fff; border-radius: 4px; cursor: pointer;">Cancelar</button>
+            
+            <button (click)="registrarReporte()" style="padding: 8px 16px; border: none; background: #28a745; color: white; border-radius: 4px; cursor: pointer;">💾 Registrar Reporte</button>
+        </div>
+
+    </div> 
+</div>

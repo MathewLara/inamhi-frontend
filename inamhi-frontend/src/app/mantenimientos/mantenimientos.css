@@ -1,0 +1,120 @@
+/* Contenedor General */
+.mante-container {
+    padding: 30px;
+    background-color: transparent;
+}
+
+/* Cabecera Flexible */
+.header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+h2 {
+    color: #003366;
+    font-weight: 800;
+    margin: 0;
+    border-left: 5px solid #003366;
+    padding-left: 15px;
+}
+
+/* Botón Crear */
+.btn-crear {
+    background-color: #003366;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+    transition: background 0.3s;
+}
+.btn-crear:hover { background-color: #00509e; }
+
+/* Tarjeta Blanca */
+.card-tabla {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+    padding: 30px;
+    overflow: hidden;
+}
+
+/* Tabla */
+table { width: 100%; border-collapse: collapse; }
+thead { background-color: #174b80; border-bottom: 2px solid #edf2f7; }
+th { text-align: left; padding: 18px; color: #f1f5f9; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.8px; }
+td { padding: 15px 18px; border-bottom: 1px solid #f1f5f9; color: #334155; font-size: 14px; vertical-align: middle; }
+tbody tr:hover { background-color: #f8fafc; transition: background 0.2s; }
+
+/* --- ✨ BADGES INTERACTIVOS (Botoncitos) ✨ --- */
+.badge { 
+    padding: 8px 16px;          /* Un poco más grandes para facilitar el clic */
+    border-radius: 30px;        /* Bordes bien redondos (Píldora) */
+    font-size: 11px; 
+    font-weight: 800; 
+    text-transform: uppercase; 
+    letter-spacing: 0.5px; 
+    display: inline-block;
+    
+    /* Magia visual */
+    transition: all 0.2s ease;  /* Animación suave */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Sombra suave normal */
+    user-select: none;          /* Evita que se seleccione el texto al dar clic rápido */
+}
+
+/* Efecto al pasar el mouse (Solo si no está deshabilitado por el HTML) */
+.badge:hover {
+    transform: translateY(-2px); /* Se eleva un poquito */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15); /* Sombra crece */
+    filter: brightness(0.95);    /* Se oscurece un pelín para resaltar */
+}
+
+/* Efecto al hacer clic */
+.badge:active {
+    transform: scale(0.95);      /* Se encoge un poco (efecto pulsación) */
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* COLORES DE ESTADO */
+/* 🔴 Pendiente */
+.rojo { background: #fef2f2; color: #b91c1c; border: 1px solid #fee2e2; }
+
+/* 🟠 En Revisión */
+.naranja { background: #fff7ed; color: #c2410c; border: 1px solid #ffedd5; }
+
+/* 🟢 Reparado */
+.verde { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+
+
+/* Botón Ver */
+.btn-ver { background-color: #003366; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 12px; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 6px rgba(0, 51, 102, 0.2); transition: all 0.3s ease; }
+.btn-ver:hover { background-color: #00509e; transform: translateY(-2px); }
+
+/* --- VENTANAS MODALES --- */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(2px); }
+.modal-content { background: white; width: 450px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: aparecer 0.3s ease-out; }
+.modal-header { background-color: #003366; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+.modal-header h3 { margin: 0; font-size: 16px; }
+.btn-close-x { background: none; border: none; color: white; font-size: 20px; cursor: pointer; }
+.modal-body { padding: 25px; }
+.modal-row { margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+.modal-label { font-size: 11px; color: #888; font-weight: bold; text-transform: uppercase; }
+.modal-value { font-size: 15px; color: #333; font-weight: 500; margin-top: 2px; }
+.modal-footer { padding: 15px; text-align: right; background-color: #f9fafb; display: flex; gap: 10px; justify-content: flex-end;}
+
+/* Botones Modal */
+.btn-cerrar { background-color: #444; color: white; border: none; padding: 8px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+.btn-guardar { background-color: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+.btn-cancelar { background-color: transparent; color: #666; border: 1px solid #ccc; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+
+/* Inputs Formulario */
+.form-group { margin-bottom: 15px; }
+.form-group label { display: block; font-size: 12px; color: #555; font-weight: bold; margin-bottom: 5px; }
+.input-custom { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; box-sizing: border-box; outline: none; transition: border 0.3s; }
+.input-custom:focus { border-color: #003366; background-color: #f0f8ff; }
+
+@keyframes aparecer { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }

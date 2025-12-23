@@ -1,0 +1,67 @@
+<div style="padding: 30px; font-family: Arial, sans-serif; background-color: #f4f6f9; min-height: 100vh;">
+    
+    <div style="background-color: white; max-width: 800px; margin: 0 auto; padding: 40px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+        
+        <h2 style="color: #003366; margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 15px;">
+            📝 Registrar Nuevo TDR
+        </h2>
+
+        <div style="display: flex; gap: 20px; margin-bottom: 20px;">
+            <div style="flex: 1;">
+                <label style="display: block; font-weight: bold; font-size: 12px; margin-bottom: 5px;">NÚMERO DE TDR:</label>
+                <input type="text" [(ngModel)]="nuevoCodigo" placeholder="Ej: TDR-2025-001" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+            </div>
+            <div style="flex: 1;">
+                <label style="display: block; font-weight: bold; font-size: 12px; margin-bottom: 5px;">TIPO PROCESO:</label>
+                <select [(ngModel)]="nuevoTipo" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; background-color: white;">
+                    <option>Ínfima Cuantía</option>
+                    <option>Catálogo Electrónico</option>
+                    <option>Subasta Inversa</option>
+                    <option>Régimen Especial</option>
+                </select>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label style="display: block; font-weight: bold; font-size: 12px; margin-bottom: 5px;">OBJETO DE CONTRATACIÓN:</label>
+            <textarea rows="3" [(ngModel)]="nuevoObjeto" placeholder="Descripción detallada del servicio..." style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;"></textarea>
+        </div>
+
+        <div style="display: flex; gap: 20px; margin-bottom: 20px;">
+            <div style="flex: 1;">
+                <label style="display: block; font-weight: bold; font-size: 12px; margin-bottom: 5px;">DIRECCIÓN SOLICITANTE:</label>
+                <select [(ngModel)]="nuevaDireccion" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; background-color: white;">
+                    <option>TICs (Tecnología)</option>
+                    <option>Administrativa Financiera</option>
+                    <option>Dirección Ejecutiva</option>
+                    <option>Hidrología</option>
+                </select>
+            </div>
+            <div style="flex: 1;">
+                <label style="display: block; font-weight: bold; font-size: 12px; margin-bottom: 5px;">PRESUPUESTO ($):</label>
+                <input type="number" [(ngModel)]="nuevoPresupuesto" placeholder="0.00" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 20px; margin-bottom: 30px;">
+            <div style="flex: 1;">
+                <label style="display: block; font-weight: bold; font-size: 12px; margin-bottom: 5px;">FECHA INICIO:</label>
+                <input type="date" [(ngModel)]="nuevaFechaInicio" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+            </div>
+            <div style="flex: 1;">
+                <label style="display: block; font-weight: bold; font-size: 12px; margin-bottom: 5px; color: #d9534f;">FECHA FIN (Vencimiento):</label>
+                <input type="date" [(ngModel)]="nuevaFechaFin" style="width: 100%; padding: 12px; border: 1px solid #d9534f; border-radius: 4px; box-sizing: border-box;">
+            </div>
+        </div>
+
+        <div style="text-align: right; border-top: 1px solid #eee; padding-top: 20px;">
+            <button routerLink="/tdr-lista" style="background-color: #6c757d; color: white; border: none; padding: 12px 25px; border-radius: 5px; cursor: pointer; margin-right: 10px;">
+                Cancelar
+            </button>
+            <button (click)="guardar()" style="background-color: #003366; color: white; border: none; padding: 12px 30px; border-radius: 5px; cursor: pointer; font-weight: bold;">
+                💾 GUARDAR TDR
+            </button>
+        </div>
+
+    </div>
+</div>

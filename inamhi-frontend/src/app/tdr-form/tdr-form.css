@@ -1,0 +1,11 @@
+/* Quitar las flechas en Chrome, Safari, Edge, Opera */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Quitar las flechas en Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
