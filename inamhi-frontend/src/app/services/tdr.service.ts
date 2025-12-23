@@ -16,6 +16,11 @@ export class TdrService {
   getTdrs(): Observable<any> {
     return this.http.get(this.apiUrl);
   }
+  // Agrega esto debajo de getTdrs()
+  getTdrById(id: any): Observable<any> {
+  return this.http.get(`${this.apiUrl}/${id}`);
+  }
+  
 
   // 2. CREAR NUEVO
   createTdr(data: any): Observable<any> {
