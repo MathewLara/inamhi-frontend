@@ -16,6 +16,10 @@ export class AppComponent implements OnInit {
   mostrarPerfil: boolean = false;
   mostrarNotificaciones: boolean = false;
   mostrarModalEditar: boolean = false;
+  
+  // VARIABLES DE CONTROL DE ACCESO
+  esAdmin: boolean = false; 
+  esOperativo: boolean = false; 
 
   usuario = { 
     nombre: 'Usuario', 
@@ -39,8 +43,17 @@ export class AppComponent implements OnInit {
       if (event instanceof NavigationEnd) {
         const urlReal = event.urlAfterRedirects || event.url;
         this.mostrarMenu = !urlReal.includes('/login');
+        
         if (this.mostrarMenu) {
           this.cargarDatos();
+          
+          // --- MEJORA: REDIRECCIÓN AUTOMÁTICA PARA OPERATIVOS ---
+          // Si es operativo (Personal de Campo) y está intentando entrar al inicio o dashboard, 
+          // lo redirigimos a Contratos para que no vea datos que no le corresponden.
+          if (this.esOperativo && (urlReal === '/dashboard' || urlReal === '/')) {
+            console.log("Redirigiendo Operativo a Contratos Profesionales...");
+            this.router.navigate(['/contratos']);
+          }
         }
       }
     });
@@ -54,11 +67,23 @@ export class AppComponent implements OnInit {
         this.usuario.nombre = userObj.nombre || userObj.nombres || 'Usuario';
         this.usuario.rol = userObj.rol || userObj.nombre_rol || 'Invitado';
         this.usuario.email = userObj.email || 'usuario@inamhi.gob.ec';
+
+        const rolTexto = this.usuario.rol.toLowerCase();
+
+        // Lógica de Administrador: Detecta variantes de Administrador y excluye Técnicos
+        this.esAdmin = rolTexto.includes('administrador') && !rolTexto.includes('técnico');
+        
+        // Lógica Operativa: Identifica personal de campo u operativo
+        this.esOperativo = rolTexto.includes('operativo') || rolTexto.includes('campo');
+        
+        console.log("Sesión activa - Rol:", this.usuario.rol, "| Admin:", this.esAdmin, "| Operativo:", this.esOperativo);
       } catch (e) {
-        console.error("Error cargando datos", e);
+        console.error("Error cargando datos de usuario", e);
       }
     }
   }
+
+  // --- FUNCIONES DE INTERFAZ ---
 
   togglePerfil(event?: Event) {
     if (event) event.stopPropagation();
@@ -72,7 +97,6 @@ export class AppComponent implements OnInit {
     this.mostrarPerfil = false;
   }
 
-  // --- FUNCIONES QUE FALTABAN PARA EL MODAL ---
   abrirEdicion() {
     this.usuarioTemporal = { ...this.usuario };
     this.mostrarPerfil = false;
@@ -100,8 +124,11 @@ export class AppComponent implements OnInit {
   logout() {
     localStorage.clear();
     this.mostrarPerfil = false;
+    this.esAdmin = false; 
+    this.esOperativo = false; 
     this.router.navigate(['/login']);
   }
+
   irA(ruta: string) {
     this.mostrarNotificaciones = false;
     this.router.navigate([ruta]);

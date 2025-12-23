@@ -1,0 +1,73 @@
+<div class="page-container">
+    <h2 style="color: #003366;">👥 Gestión de Usuarios</h2>
+
+    <div class="card-table" *ngIf="!usuarioSeleccionado">
+        <table class="table-custom">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>NOMBRE</th>
+                    <th>USUARIO</th>
+                    <th>ROL</th>
+                    <th>ACCIONES</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let u of listaUsuarios">
+                    <td>{{ u.id }}</td>
+                    <td>{{ u.nombre }}</td>
+                    <td>{{ u.username }}</td>
+                    <td>
+                        <span [ngClass]="{'badge-admin': u.rol==='admin', 'badge-user': u.rol!=='admin'}">
+                            {{ u.rol }}
+                        </span>
+                    </td>
+                    <td>
+                        <button (click)="seleccionarUsuario(u)" class="btn-editar">
+                            ✏️ Editar
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="filtros-card" *ngIf="usuarioSeleccionado" style="max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+        <h3 style="color: #003366; margin-top: 0;">✏️ Editando a: {{ usuarioSeleccionado.nombre }}</h3>
+        
+        <div class="form-group" style="margin-bottom: 15px;">
+            <label>Nombre Completo:</label>
+            <input type="text" [(ngModel)]="usuarioSeleccionado.nombre" class="input-custom" style="width: 100%;">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 15px;">
+            <label>Nombre de Usuario (Login):</label>
+            <input type="text" [(ngModel)]="usuarioSeleccionado.username" class="input-custom" style="width: 100%;">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 15px;">
+            <label>Correo Electrónico:</label>
+            <input type="email" [(ngModel)]="usuarioSeleccionado.email" class="input-custom" style="width: 100%;">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 15px;">
+            <label>Rol:</label>
+            <select [(ngModel)]="usuarioSeleccionado.rol" class="input-custom" style="width: 100%;">
+                <option value="admin">Administrador</option>
+                <option value="tecnico">Técnico</option>
+                <option value="operativo">Operativo</option>
+            </select>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 20px; background: #fff3cd; padding: 10px; border-radius: 5px; border: 1px solid #ffeeba;">
+            <label style="color: #856404; font-weight: bold;">🔑 Cambiar Contraseña (Opcional):</label>
+            <input type="text" [(ngModel)]="passwordNueva" placeholder="Escribe aquí solo si quieres cambiarla" class="input-custom" style="width: 100%; border: 1px solid #e0a800;">
+            <small style="color: #666;">Si lo dejas en blanco, se mantiene la contraseña actual.</small>
+        </div>
+
+        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+            <button (click)="cancelarEdicion()" class="btn-cancelar" style="background: #ccc; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">Cancelar</button>
+            <button (click)="guardar()" class="btn-guardar" style="background: #003366; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">💾 Guardar Cambios</button>
+        </div>
+    </div>
+</div>

@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms'; 
 import { TdrService } from '../services/tdr.service'; 
-// Importa HttpClientModule si fuera necesario en tu versión, pero suele estar en app.config
 
 @Component({
   selector: 'app-tdr-lista',
@@ -19,6 +18,9 @@ export class TdrListaComponent implements OnInit {
   mostrarModalVer: boolean = false;
   tdrSeleccionado: any = null;
 
+  // VARIABLE DE CONTROL DE ACCESO (ADMINISTRADOR)
+  esAdmin: boolean = false; 
+
   constructor(
     private tdrService: TdrService, 
     private router: Router,
@@ -26,7 +28,28 @@ export class TdrListaComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.verificarRol(); // Se ejecuta la validación de seguridad al iniciar
     this.obtenerTdrs();
+  }
+
+  // LÓGICA DE DETECCIÓN DE ROL SEGÚN REQUERIMIENTOS
+  verificarRol() {
+    const data = localStorage.getItem('usuario');
+    if (data) {
+      try {
+        const userObj = JSON.parse(data);
+        const rolTexto = (userObj.rol || userObj.nombre_rol || '').toLowerCase();
+        
+        // El administrador del sistema es detectado, pero se excluye al personal técnico
+        // Esto evita que 'Técnico Administrativo' sea detectado como administrador.
+        this.esAdmin = rolTexto.includes('administrador') && !rolTexto.includes('técnico');
+        
+        console.log("Vista TDR - Rol:", rolTexto, "| ¿Es Administrador?:", this.esAdmin);
+      } catch (e) {
+        console.error("Error al verificar rol", e);
+        this.esAdmin = false;
+      }
+    }
   }
 
   obtenerTdrs() {
@@ -44,23 +67,28 @@ export class TdrListaComponent implements OnInit {
     });
   }
 
-  // --- NUEVO: EDITAR TDR ---
+  // PROTECCIÓN DE ACCIONES CRÍTICAS (REQUERIMIENTO 2.1)
   editarTdr(tdr: any) {
-    // Navega a la pantalla de creación pero pasando el ID para que se carguen los datos
-    // Asegúrate de que en tu app.routes tengas una ruta que acepte parámetros o usa queryParams
-    // Ejemplo: /nuevo-tdr/5
+    if (!this.esAdmin) {
+      alert('Acción restringida: Solo el administrador puede modificar TDRs.');
+      return;
+    }
     this.router.navigate(['/nuevo-tdr'], { queryParams: { id: tdr.id_tdr } });
   }
 
-  // --- NUEVO: ELIMINAR TDR ---
+  // ELIMINAR TDR: Restaurado solo para administradores con confirmación
   eliminarTdr(tdr: any) {
+    // Bloqueo total para técnicos y operativos
+    if (!this.esAdmin) {
+      alert('Acción restringida: Solo el administrador puede eliminar registros del sistema.');
+      return;
+    }
+
     if(confirm(`¿Estás seguro de que deseas eliminar el TDR: ${tdr.numero_tdr}?`)) {
-      
-      // Llamamos al servicio (Asegurate de tener deleteTdr en tu servicio)
       this.tdrService.deleteTdr(tdr.id_tdr).subscribe({
         next: () => {
-          alert('TDR Eliminado correctamente');
-          this.obtenerTdrs(); // Recargar la lista
+          alert('✅ TDR Eliminado correctamente');
+          this.obtenerTdrs(); 
         },
         error: (err) => {
           console.error(err);
@@ -70,7 +98,6 @@ export class TdrListaComponent implements OnInit {
     }
   }
 
-  // --- MODAL DE DETALLES ---
   verTdr(tdr: any) {
     this.tdrSeleccionado = tdr;
     this.mostrarModalVer = true;
@@ -81,10 +108,9 @@ export class TdrListaComponent implements OnInit {
     this.tdrSeleccionado = null;
   }
 
-  // --- AYUDAS VISUALES ---
   getClaseBadge(estado: any): string {
     const s = String(estado || '').toUpperCase();
-    if (s.includes('BORRADOR') || s === '1') return 'bg-secondary'; // 1 es ID Borrador
+    if (s.includes('BORRADOR') || s === '1') return 'bg-secondary'; 
     if (s.includes('PROCESO')) return 'bg-warning text-dark';
     if (s.includes('APROBADO')) return 'bg-success';
     return 'bg-light text-dark border';

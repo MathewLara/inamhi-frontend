@@ -9,8 +9,9 @@
         </div>
         
         <div class="menu-items">
-            <a routerLink="/dashboard" class="menu-btn" routerLinkActive="active-link">📂 Inicio</a>
-            <a routerLink="/tdr-lista" class="menu-btn" routerLinkActive="active-link">📄 Gestión de TDR</a>
+            <a *ngIf="!esOperativo" routerLink="/dashboard" class="menu-btn" routerLinkActive="active-link">📂 Inicio</a>
+            
+            <a *ngIf="!esOperativo" routerLink="/tdr-lista" class="menu-btn" routerLinkActive="active-link">📄 Gestión de TDR</a>
             
             <a routerLink="/contratos" 
                class="menu-btn" 
@@ -18,8 +19,21 @@
                 👥 Contratos Prof.
             </a>
 
-            <a routerLink="/mantenimientos" class="menu-btn" routerLinkActive="active-link">🔧 Mantenimientos</a>
-        </div>
+            <a *ngIf="!esOperativo" routerLink="/mantenimientos" class="menu-btn" routerLinkActive="active-link">🔧 Mantenimientos</a>
+
+            <div *ngIf="esAdmin" class="admin-menu-section">
+                <div class="menu-separator"></div>
+                <p class="menu-category-title">ADMINISTRACIÓN</p>
+                
+                <a routerLink="/usuarios" class="menu-btn admin-btn" routerLinkActive="active-link">
+                   👤 Usuarios
+                </a>
+                
+                <a routerLink="/auditoria" class="menu-btn admin-btn" routerLinkActive="active-link">
+                   📜 Auditoría
+                </a>
+            </div>
+        </div> 
         
         <a (click)="logout()" class="menu-btn logout-btn">🚪 Cerrar Sesión</a>
         <div class="version-text">v1.0.0 - 2025</div>

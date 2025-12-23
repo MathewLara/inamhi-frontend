@@ -9,12 +9,12 @@ import { AuthService } from '../services/auth.service';
   standalone: true,
   imports: [FormsModule, CommonModule],
   templateUrl: './login.html',
-  styleUrl: './login.css'
+  styleUrl: './login.css' // Ojo: a veces es styleUrls (plural) en versiones viejas, pero styleUrl (singular) está bien en Angular 17+
 })
 export class LoginComponent {
 
   usuario: string = '';
-  password: string = ''; // <--- Tu variable se llama password
+  password: string = '';
   mensajeError: string = '';
   cargando: boolean = false;
 
@@ -32,7 +32,8 @@ export class LoginComponent {
 
     // 2. UNA SOLA LLAMADA AL BACKEND
     this.authService.login(this.usuario, this.password).subscribe({
-      next: (res) => {
+      // CORRECCIÓN AQUÍ: Agregamos ": any" para calmar a TypeScript
+      next: (res: any) => { 
         console.log('Respuesta real del servidor:', res);
         
         // 3. LIMPIEZA NUCLEAR DE MEMORIA VIEJA
@@ -40,12 +41,12 @@ export class LoginComponent {
         sessionStorage.clear();
 
         // 4. GUARDAR SESIÓN Y NAVEGAR
-        // Usamos 'res.token' y 'res.usuario' que vienen del backend
         this.authService.guardarSesion(res.token, res.usuario);
         
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/dashboard']); // Asegúrate que esta ruta exista en tu app.routes.ts
       },
-      error: (err) => {
+      // CORRECCIÓN AQUÍ: Agregamos ": any"
+      error: (err: any) => { 
         console.error('Error login:', err);
         this.cargando = false;
         
