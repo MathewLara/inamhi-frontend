@@ -1,5 +1,5 @@
-import { Component, HostListener } from '@angular/core';
-import { RouterOutlet, RouterLink, Router, NavigationEnd } from '@angular/router';
+import { Component, HostListener, OnInit } from '@angular/core';
+import { Router, NavigationEnd, RouterOutlet, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -10,21 +10,18 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   
-  // 1. IMPORTANTE: Iniciamos en 'false' para que no aparezca el menú de golpe
   mostrarMenu: boolean = false; 
-  
   mostrarPerfil: boolean = false;
   mostrarNotificaciones: boolean = false;
   mostrarModalEditar: boolean = false;
 
-  // DATOS DEL USUARIO
-  usuario = {
-    nombre: 'Usuario',
-    rol: 'Invitado',
-    email: 'usuario@inamhi.gob.ec',
-    departamento: 'Tecnología (TICs)'
+  usuario = { 
+    nombre: 'Usuario', 
+    rol: 'Invitado', 
+    email: 'usuario@inamhi.gob.ec', 
+    departamento: 'Tecnología (TICs)' 
   };
   
   usuarioTemporal: any = {};
@@ -35,50 +32,47 @@ export class AppComponent {
     { mensaje: '🔧 Mantenimiento de Server pendiente', fecha: 'Ayer', ruta: '/mantenimientos' }
   ];
 
-  constructor(private router: Router) {
+  constructor(private router: Router) {}
+
+  ngOnInit() {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
-        
-        // 2. CORRECCIÓN CLAVE: Usamos 'urlAfterRedirects' para mayor precisión
-        // Esto asegura que si estás en '/login', la variable sea false.
         const urlReal = event.urlAfterRedirects || event.url;
         this.mostrarMenu = !urlReal.includes('/login');
-
-        // 3. RECUPERAR DATOS DE LA MEMORIA (Solo si mostramos el menú)
         if (this.mostrarMenu) {
-            const nombreGuardado = localStorage.getItem('usuarioNombre');
-            const rolGuardado = localStorage.getItem('usuarioRol');
-            const emailGuardado = localStorage.getItem('usuarioEmail');
-
-            if (nombreGuardado) this.usuario.nombre = nombreGuardado;
-            if (rolGuardado) this.usuario.rol = rolGuardado;
-            if (emailGuardado) this.usuario.email = emailGuardado;
+          this.cargarDatos();
         }
       }
     });
   }
 
-  togglePerfil() {
+  cargarDatos() {
+    const data = localStorage.getItem('usuario');
+    if (data) {
+      try {
+        const userObj = JSON.parse(data);
+        this.usuario.nombre = userObj.nombre || userObj.nombres || 'Usuario';
+        this.usuario.rol = userObj.rol || userObj.nombre_rol || 'Invitado';
+        this.usuario.email = userObj.email || 'usuario@inamhi.gob.ec';
+      } catch (e) {
+        console.error("Error cargando datos", e);
+      }
+    }
+  }
+
+  togglePerfil(event?: Event) {
+    if (event) event.stopPropagation();
     this.mostrarPerfil = !this.mostrarPerfil;
     this.mostrarNotificaciones = false;
   }
 
-  toggleNotificaciones() {
+  toggleNotificaciones(event?: Event) {
+    if (event) event.stopPropagation();
     this.mostrarNotificaciones = !this.mostrarNotificaciones;
     this.mostrarPerfil = false;
   }
 
-  irA(ruta: string) {
-    this.mostrarNotificaciones = false;
-    this.router.navigate([ruta]);
-  }
-
-  logout() {
-    this.mostrarPerfil = false;
-    localStorage.clear();
-    this.router.navigate(['/login']);
-  }
-
+  // --- FUNCIONES QUE FALTABAN PARA EL MODAL ---
   abrirEdicion() {
     this.usuarioTemporal = { ...this.usuario };
     this.mostrarPerfil = false;
@@ -91,18 +85,31 @@ export class AppComponent {
 
   guardarCambios() {
     this.usuario = { ...this.usuarioTemporal };
-    localStorage.setItem('usuarioNombre', this.usuario.nombre);
-    localStorage.setItem('usuarioEmail', this.usuario.email);
+    
+    const existing = localStorage.getItem('usuario');
+    let userObj = existing ? JSON.parse(existing) : {};
+    
+    userObj.nombre = this.usuario.nombre;
+    userObj.email = this.usuario.email;
+    
+    localStorage.setItem('usuario', JSON.stringify(userObj));
     this.mostrarModalEditar = false;
-    alert("✅ Perfil actualizado correctamente");
+    alert("✅ Perfil actualizado");
   }
 
-  // --- ESCUCHA DE CLICS GLOBALES ---
-  @HostListener('document:click', ['$event'])
-  clickGlobal(event?: any) {
-    // Si el clic no fue dentro del menú, cerramos los desplegables
-    // (Angular maneja esto, pero aseguramos que se cierren al dar clic fuera)
-    this.mostrarNotificaciones = false;
+  logout() {
+    localStorage.clear();
     this.mostrarPerfil = false;
+    this.router.navigate(['/login']);
+  }
+  irA(ruta: string) {
+    this.mostrarNotificaciones = false;
+    this.router.navigate([ruta]);
+  }
+
+  @HostListener('document:click')
+  clickGlobal() {
+    this.mostrarPerfil = false;
+    this.mostrarNotificaciones = false;
   }
 }

@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../services/auth.service'; // <--- Importamos el servicio
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -14,9 +14,9 @@ import { AuthService } from '../services/auth.service'; // <--- Importamos el se
 export class LoginComponent {
 
   usuario: string = '';
-  password: string = '';
+  password: string = ''; // <--- Tu variable se llama password
   mensajeError: string = '';
-  cargando: boolean = false; // Para evitar doble clic
+  cargando: boolean = false;
 
   constructor(private authService: AuthService, private router: Router) {}
 
@@ -30,20 +30,22 @@ export class LoginComponent {
     this.mensajeError = '';
     this.cargando = true;
 
-    // 2. CONEXIÓN CON EL BACKEND REAL
+    // 2. UNA SOLA LLAMADA AL BACKEND
     this.authService.login(this.usuario, this.password).subscribe({
-      next: (respuesta) => {
-        // SI TODO SALE BIEN (Backend responde 200 OK)
-        console.log('Login exitoso:', respuesta);
+      next: (res) => {
+        console.log('Respuesta real del servidor:', res);
         
-        // Guardamos el token y los datos
-        this.authService.guardarSesion(respuesta.token, respuesta.usuario);
+        // 3. LIMPIEZA NUCLEAR DE MEMORIA VIEJA
+        localStorage.clear(); 
+        sessionStorage.clear();
+
+        // 4. GUARDAR SESIÓN Y NAVEGAR
+        // Usamos 'res.token' y 'res.usuario' que vienen del backend
+        this.authService.guardarSesion(res.token, res.usuario);
         
-        // Vamos al Dashboard
         this.router.navigate(['/dashboard']);
       },
       error: (err) => {
-        // SI SALE MAL (Backend responde error)
         console.error('Error login:', err);
         this.cargando = false;
         

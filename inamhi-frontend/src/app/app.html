@@ -32,7 +32,7 @@
             
             <div class="header-actions">
                 <div class="notification-wrapper" (click)="$event.stopPropagation()">
-                    <span (click)="toggleNotificaciones()" class="bell-icon">
+                    <span (click)="toggleNotificaciones($event)" class="bell-icon">
                         🔔 <span class="badge">{{ misNotificaciones.length }}</span>
                     </span>
                     <div class="dropdown-menu notif-dropdown" *ngIf="mostrarNotificaciones">
@@ -44,7 +44,7 @@
                     </div>
                 </div>
 
-                <div class="user-profile-wrapper" (click)="togglePerfil(); $event.stopPropagation()">
+                <div class="user-profile-wrapper" (click)="togglePerfil($event)">
                     <div class="user-avatar-small">{{ usuario.nombre.charAt(0) }}</div>
                     <div class="user-info-text">
                         <div class="user-name">{{ usuario.nombre }}</div>
